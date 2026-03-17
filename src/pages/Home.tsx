@@ -4,6 +4,7 @@ import { Link } from "react-router-dom"
 import { Upload, Image as ImageIcon, Activity, Zap, Copy, CheckCircle2, ExternalLink } from "lucide-react"
 import { Button } from "@/src/components/ui/Button"
 import { Card } from "@/src/components/ui/Card"
+import { AdBanner } from "@/src/components/ui/AdBanner"
 import { formatDistanceToNow } from "date-fns"
 
 interface HistoryItem {
@@ -91,6 +92,14 @@ export function Home() {
             </Button>
           </Link>
         </motion.div>
+        
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          <AdBanner />
+        </motion.div>
       </div>
 
       <motion.div 
@@ -124,9 +133,9 @@ export function Home() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <AnimatePresence>
-              {recentImages.map((item) => (
+              {recentImages.map((item, index) => (
                 <motion.div
-                  key={item.id}
+                  key={`${item.id}-${index}`}
                   layout
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}

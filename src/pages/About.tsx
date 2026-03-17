@@ -1,6 +1,7 @@
 import { motion } from "motion/react"
 import { Shield, Zap, Image as ImageIcon, Code, Globe2, Server } from "lucide-react"
 import { Card } from "@/src/components/ui/Card"
+import { AdBanner } from "@/src/components/ui/AdBanner"
 
 export function About() {
   const features = [
@@ -70,12 +71,20 @@ export function About() {
         >
           No ads. No tracking. Just pure performance.
         </motion.p>
+        
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
+          <AdBanner />
+        </motion.div>
       </div>
 
       <motion.div 
         initial={{ y: 40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.4 }}
+        transition={{ delay: 0.5 }}
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
       >
         {features.map((feature, i) => (

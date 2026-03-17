@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "motion/react"
 import { Trash2, Copy, CheckCircle2, ExternalLink, Clock } from "lucide-react"
 import { Button } from "@/src/components/ui/Button"
 import { Card } from "@/src/components/ui/Card"
+import { AdBanner } from "@/src/components/ui/AdBanner"
 import { formatDistanceToNow } from "date-fns"
 
 interface HistoryItem {
@@ -63,6 +64,8 @@ export function History() {
         </div>
       </div>
 
+      <AdBanner />
+
       {history.length === 0 ? (
         <Card className="p-12 flex flex-col items-center justify-center text-center border-dashed border-white/10 bg-transparent">
           <div className="w-16 h-16 rounded-full bg-surface-light flex items-center justify-center mb-4">
@@ -76,9 +79,9 @@ export function History() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <AnimatePresence>
-            {history.map((item) => (
+            {history.map((item, index) => (
               <motion.div
-                key={item.id}
+                key={`${item.id}-${index}`}
                 layout
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}

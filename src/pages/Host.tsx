@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "motion/react"
 import { Upload, X, Copy, CheckCircle2, Loader2, Link as LinkIcon, Code, Globe } from "lucide-react"
 import { Button } from "@/src/components/ui/Button"
 import { Card } from "@/src/components/ui/Card"
+import { AdBanner } from "@/src/components/ui/AdBanner"
 import { cn } from "@/src/lib/utils"
 
 const compressImage = async (file: File, maxWidth = 1920, quality = 0.8): Promise<File> => {
@@ -236,6 +237,7 @@ export function Host() {
       className="max-w-3xl mx-auto space-y-12 pb-20 pt-8"
     >
       <div className="space-y-8">
+        <AdBanner />
         <div className="text-center space-y-3">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Upload Image</h1>
           <p className="text-text-secondary text-lg">Drag and drop anywhere to upload.</p>
@@ -330,6 +332,8 @@ export function Host() {
                   {error}
                 </div>
               )}
+
+              <AdBanner />
 
               <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
                 <div className="w-full sm:w-auto flex-1">
