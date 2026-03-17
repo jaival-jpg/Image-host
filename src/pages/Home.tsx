@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "motion/react"
+import { motion } from "motion/react"
 import { Link } from "react-router-dom"
-import { Upload, Image as ImageIcon, Activity, Zap, Copy, CheckCircle2, ExternalLink } from "lucide-react"
+import { Upload, Image as ImageIcon, Activity, HardDrive } from "lucide-react"
 import { Button } from "@/src/components/ui/Button"
-import { Card } from "@/src/components/ui/Card"
 import { AdBanner } from "@/src/components/ui/AdBanner"
-import { formatDistanceToNow } from "date-fns"
 
 interface HistoryItem {
   id: string
@@ -13,39 +11,45 @@ interface HistoryItem {
   url: string
   url_viewer: string
   time: number
+  size: number
   delete_url: string
 }
 
+function formatBytes(bytes: number, decimals = 2) {
+  if (!+bytes) return '0 B'
+  const k = 1024
+  const dm = decimals < 0 ? 0 : decimals
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
+}
+
 export function Home() {
-  const [recentImages, setRecentImages] = useState<HistoryItem[]>([])
-  const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [history, setHistory] = useState<HistoryItem[]>([])
 
   useEffect(() => {
     const storedHistory = localStorage.getItem("uploadHistory")
     if (storedHistory) {
       try {
-        const history = JSON.parse(storedHistory)
-        setRecentImages(history.slice(0, 6)) // Show top 6
+        setHistory(JSON.parse(storedHistory))
       } catch (e) {
         console.error("Failed to parse history", e)
       }
     }
   }, [])
 
-  const copyToClipboard = async (text: string, id: string) => {
-    try {
-      await navigator.clipboard.writeText(text)
-      setCopiedId(id)
-      setTimeout(() => setCopiedId(null), 2000)
-    } catch (err) {
-      console.error("Failed to copy:", err)
-    }
-  }
+  const totalImages = history.length
+  const todayImages = history.filter(item => {
+    const itemDate = new Date(item.time * 1000)
+    const today = new Date()
+    return itemDate.toDateString() === today.toDateString()
+  }).length
+  const totalSize = history.reduce((acc, item) => acc + (item.size || 0), 0)
 
   const stats = [
-    { title: "Total Images Hosted", value: "1.2M+", icon: ImageIcon, color: "text-blue-400" },
-    { title: "Images Hosted Today", value: "4,521", icon: Activity, color: "text-green-400" },
-    { title: "Server Speed", value: "99.9%", icon: Zap, color: "text-primary" },
+    { title: "Your Total Uploads", value: totalImages.toString(), icon: ImageIcon, color: "text-blue-400" },
+    { title: "Uploaded Today", value: todayImages.toString(), icon: Activity, color: "text-green-400" },
+    { title: "Storage Used", value: formatBytes(totalSize), icon: HardDrive, color: "text-primary" },
   ]
 
   return (
@@ -116,89 +120,6 @@ export function Home() {
           </div>
         ))}
       </motion.div>
-
-      {recentImages.length > 0 && (
-        <motion.div 
-          initial={{ y: 40, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="w-full max-w-5xl mt-16 space-y-8"
-        >
-          <div className="flex items-center justify-between px-2">
-            <h2 className="text-2xl font-bold text-white">Recent Uploads</h2>
-            <Link to="/history" className="text-primary hover:text-primary-glow text-sm font-medium transition-colors">
-              View All History
-            </Link>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <AnimatePresence>
-              {recentImages.map((item, index) => (
-                <motion.div
-                  key={`${item.id}-${index}`}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Card className="overflow-hidden group flex flex-col h-full rounded-3xl border-white/5 bg-surface/30 hover:bg-surface/50 transition-colors duration-300">
-                    <div className="relative aspect-video bg-black/50 overflow-hidden">
-                      <img 
-                        src={item.url} 
-                        alt={item.title} 
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                        <a 
-                          href={item.url_viewer} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-sm font-medium text-white hover:text-primary transition-colors"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          View Original
-                        </a>
-                      </div>
-                    </div>
-                    
-                    <div className="p-5 flex flex-col flex-1 justify-between gap-4">
-                      <div>
-                        <h4 className="font-semibold truncate text-white" title={item.title || "Untitled Image"}>
-                          {item.title || "Untitled Image"}
-                        </h4>
-                        <p className="text-xs text-text-secondary mt-1 font-medium">
-                          {formatDistanceToNow(item.time * 1000, { addSuffix: true })}
-                        </p>
-                      </div>
-                      
-                      <div className="flex items-center gap-2 pt-4 border-t border-white/5">
-                        <Button 
-                          variant="glass" 
-                          size="sm" 
-                          className="flex-1 text-xs rounded-xl h-10"
-                          onClick={() => copyToClipboard(item.url, item.id)}
-                        >
-                          {copiedId === item.id ? (
-                            <span className="flex items-center gap-1 text-green-400 font-bold">
-                              <CheckCircle2 className="w-4 h-4" /> COPIED
-                            </span>
-                          ) : (
-                            <span className="flex items-center gap-1 font-bold tracking-wide">
-                              <Copy className="w-4 h-4" /> COPY URL
-                            </span>
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        </motion.div>
-      )}
     </motion.div>
   )
 }

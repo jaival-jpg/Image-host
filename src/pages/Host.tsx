@@ -343,7 +343,7 @@ export function Host() {
                     disabled={isUploading}
                     className="w-full bg-surface/50 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent appearance-none font-medium transition-all hover:bg-surface"
                   >
-                    <option value="0">Keep Forever</option>
+                    <option value="0">not delete</option>
                     <option value="1">Delete after 1 hour</option>
                     <option value="6">Delete after 6 hours</option>
                     <option value="12">Delete after 12 hours</option>
