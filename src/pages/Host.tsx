@@ -149,8 +149,22 @@ export function Host() {
 
       setProgress(15)
 
+      const getBase64 = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader()
+          reader.readAsDataURL(file)
+          reader.onload = () => {
+            const result = reader.result as string
+            resolve(result.split(',')[1])
+          }
+          reader.onerror = (error) => reject(error)
+        })
+      }
+
+      const base64Image = await getBase64(fileToUpload)
+
       const formData = new FormData()
-      formData.append("image", fileToUpload)
+      formData.append("image", base64Image)
       
       if (expiration !== "0") {
         const hours = parseInt(expiration)
